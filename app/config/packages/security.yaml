@@ -28,8 +28,8 @@ security:
             entry_point: form_login
         api:
             pattern: ^/api/
-            provider: app_system_provider
-            stateless: true
+            custom_authenticators:
+                - App\Security\ApiKeyAuthenticator
         main:
             lazy: true
 

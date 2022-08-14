@@ -25,6 +25,7 @@ services:
       - ./app:/app
       - sessions:/var/www/sessions
     depends_on:
+      - rabbitmq
       - postgres
     environment:
       XDEBUG_CONFIG: "remote_host=${DOCKER_LOCAL_NETWORK_IP} remote_port=9009 remote_enable=1"
@@ -42,10 +43,30 @@ services:
       - composer:/root/.composer/cache
       - ./app/var/data/.composer/auth.json:/root/.composer/auth.json
     depends_on:
+      - rabbitmq
       - postgres
     tty: true
     environment:
       XDEBUG_CONFIG: "remote_host=${DOCKER_LOCAL_NETWORK_IP} remote_port=9009 remote_enable=1"
+      PHP_IDE_CONFIG: "serverName=Docker"
+    networks:
+      - internal
+  php-daemons:
+    container_name: ${DOCKER_PROJECT_TITLE}-php-daemons
+    restart: always
+    build:
+      context: ./docker/dev
+      dockerfile: php-daemons.docker
+    volumes:
+      - ./app:/app
+      - sessions:/var/www/sessions
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+      - postgres
+    environment:
+      XDEBUG_CONFIG: "remote_host=192.168.214.1 remote_port=9009 remote_enable=1"
       PHP_IDE_CONFIG: "serverName=Docker"
     networks:
       - internal
@@ -61,6 +82,20 @@ services:
       POSTGRES_DB: app
     ports:
       - "${DOCKER_POSTGRESQL_PORT}:5432"
+    networks:
+      - internal
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: ${DOCKER_PROJECT_TITLE}-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: guest
+    expose:
+      - "5672"
+      - "15672"
+    ports:
+      - "5672:5672"
+      - "25507:15672"
     networks:
       - internal
 

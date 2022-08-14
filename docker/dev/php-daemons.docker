@@ -26,3 +26,5 @@ COPY ./php-fpm/default.ini /usr/local/etc/php/conf.d/default.ini
 RUN echo 'php_admin_flag[display_errors] = on' >> /usr/local/etc/php-fpm.d/www.conf
 
 WORKDIR /app
+
+ENTRYPOINT supervisord --nodaemon --configuration /app/etc/supervisor/conf.d/supervisord.conf

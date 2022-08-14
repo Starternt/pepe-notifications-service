@@ -30,7 +30,7 @@ final class NotificationMessageDto
     private const SIGNUP_TYPE = 'signUp';
 
     private const TYPES = [
-        self::SIGNUP_TYPE => self::SIGNUP_TYPE
+        self::SIGNUP_TYPE => self::SIGNUP_TYPE,
     ];
 
     private int $id = 1;

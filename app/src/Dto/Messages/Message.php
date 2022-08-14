@@ -27,7 +27,6 @@ abstract class Message implements MessageInterface
         $this->setPhone($notificationMessageDto->getPhone());
     }
 
-
     public function getNotificationId(): int
     {
         return $this->notificationId;

@@ -18,7 +18,7 @@ final class SignUpMessage extends Message
         parent::__construct($notificationMessageDto);
 
         $params = $notificationMessageDto->getParams();
-        $this->code = array_key_exists('code', $params) ? (string) $params['code'] : null;
+        $this->code = \array_key_exists('code', $params) ? (string) $params['code'] : null;
     }
 
     public function getCode(): string

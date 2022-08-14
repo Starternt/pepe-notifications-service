@@ -20,11 +20,11 @@ final class CreateNotificationAction extends AbstractController
         $validationGroups = ['Default'];
         $channels = $data->getChannels();
 
-        if (in_array(MessageInterface::CHANNEL_SMS, $channels)) {
+        if (\in_array(MessageInterface::CHANNEL_SMS, $channels, true)) {
             $validationGroups[] = NotificationMessageDto::VALIDATION_PHONE;
         }
 
-        if (in_array(MessageInterface::CHANNEL_EMAIL, $channels)) {
+        if (\in_array(MessageInterface::CHANNEL_EMAIL, $channels, true)) {
             $validationGroups[] = NotificationMessageDto::VALIDATION_EMAIL;
         }
 

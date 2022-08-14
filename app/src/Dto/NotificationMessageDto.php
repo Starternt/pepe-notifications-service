@@ -6,6 +6,9 @@ namespace App\Dto;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Controller\Action\CreateNotificationAction;
+use App\Dto\Messages\MessageInterface;
+use App\Dto\Messages\SignUpMessage;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     collectionOperations: [
@@ -19,16 +22,37 @@ use App\Controller\Action\CreateNotificationAction;
         'get',
     ],
 )]
-final class MessageDto
+final class NotificationMessageDto
 {
+    public const VALIDATION_PHONE = 'notification:phone';
+    public const VALIDATION_EMAIL = 'notification:email';
+
+    private const SIGNUP_TYPE = 'signUp';
+
+    private const TYPES = [
+        self::SIGNUP_TYPE => self::SIGNUP_TYPE
+    ];
+
     private int $id = 1;
 
-    private ?int $notificationId = null;
+    #[Assert\NotBlank]
+    private int $notificationId;
 
+    #[Assert\NotBlank]
+    #[Assert\Choice(choices: self::TYPES)]
+    private string $type;
+
+    #[Assert\NotBlank(groups: [self::VALIDATION_EMAIL])]
     private ?string $email = null;
 
+    #[Assert\NotBlank(groups: [self::VALIDATION_PHONE])]
     private ?string $phone = null;
 
+    #[Assert\NotBlank]
+    #[Assert\Count(min: 1)]
+    private array $channels = [];
+
+    #[Assert\NotBlank]
     private array $params = [];
 
     public function getId(): int
@@ -51,6 +75,18 @@ final class MessageDto
     public function setNotificationId(?int $notificationId): self
     {
         $this->notificationId = $notificationId;
+
+        return $this;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): self
+    {
+        $this->type = $type;
 
         return $this;
     }
@@ -79,6 +115,18 @@ final class MessageDto
         return $this;
     }
 
+    public function getChannels(): array
+    {
+        return $this->channels;
+    }
+
+    public function setChannels(array $channels): self
+    {
+        $this->channels = $channels;
+
+        return $this;
+    }
+
     public function getParams(): array
     {
         return $this->params;
@@ -89,5 +137,16 @@ final class MessageDto
         $this->params = $params;
 
         return $this;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function createMessage(): MessageInterface
+    {
+        return match ($this->type) {
+            self::SIGNUP_TYPE => new SignUpMessage($this),
+            default => throw new \Exception('Incorrect type.'),
+        };
     }
 }

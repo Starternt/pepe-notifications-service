@@ -4,29 +4,39 @@ declare(strict_types=1);
 
 namespace App\Controller\Action;
 
-use App\Dto\MessageDto;
-use App\Entity\User;
+use ApiPlatform\Core\Validator\ValidatorInterface;
+use App\Dto\Messages\MessageInterface;
+use App\Dto\NotificationMessageDto;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class CreateNotificationAction extends AbstractController
 {
-    public function __construct(private ValidatorInterface $validator)
+    public function __construct(private readonly ValidatorInterface $validator)
     {
     }
 
-    public function __invoke(MessageDto $data)
+    public function __invoke(NotificationMessageDto $data): NotificationMessageDto
     {
-        dump($data);
+        $validationGroups = ['Default'];
+        $channels = $data->getChannels();
 
-        exit;
+        if (in_array(MessageInterface::CHANNEL_SMS, $channels)) {
+            $validationGroups[] = NotificationMessageDto::VALIDATION_PHONE;
+        }
 
-        /** @var User $user */
-        $user = $this->getUser();
+        if (in_array(MessageInterface::CHANNEL_EMAIL, $channels)) {
+            $validationGroups[] = NotificationMessageDto::VALIDATION_EMAIL;
+        }
 
-        $this->postService->create($data, $user);
+        $this->validator->validate($data, ['groups' => $validationGroups]);
 
-        $this->validator->validate($data);
+        try {
+            $message = $data->createMessage();
+        } catch (\Exception $e) {
+            throw $e; // TODO
+        }
+
+        $this->validator->validate($message);
 
         return $data;
     }

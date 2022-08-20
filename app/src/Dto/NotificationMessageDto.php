@@ -6,8 +6,6 @@ namespace App\Dto;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Controller\Action\CreateNotificationAction;
-use App\Dto\Messages\MessageInterface;
-use App\Dto\Messages\SignUpMessage;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
@@ -22,12 +20,9 @@ use Symfony\Component\Validator\Constraints as Assert;
         'get',
     ],
 )]
-final class NotificationMessageDto
+final class NotificationMessageDto implements NotificationMessageDtoInterface
 {
-    public const VALIDATION_PHONE = 'notification:phone';
-    public const VALIDATION_EMAIL = 'notification:email';
-
-    private const SIGNUP_TYPE = 'signUp';
+    public const SIGNUP_TYPE = 'signUp';
 
     private const TYPES = [
         self::SIGNUP_TYPE => self::SIGNUP_TYPE,
@@ -137,16 +132,5 @@ final class NotificationMessageDto
         $this->params = $params;
 
         return $this;
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function createMessage(): MessageInterface
-    {
-        return match ($this->type) {
-            self::SIGNUP_TYPE => new SignUpMessage($this),
-            default => throw new \Exception('Incorrect type.'),
-        };
     }
 }

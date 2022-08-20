@@ -1,9 +1,9 @@
 framework:
   messenger:
     transports:
-      async: '%env(MESSENGER_TRANSPORT_DSN)%'
+      message: '%env(MESSENGER_TRANSPORT_DSN)%'
       # failed: 'doctrine://default?queue_name=failed'
       # sync: 'sync://'
 
     routing:
-      'App\Dto\Messages\MessageInterface': async
+      'App\Dto\Message\MessageInterface': message

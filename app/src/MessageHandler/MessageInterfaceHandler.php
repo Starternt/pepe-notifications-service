@@ -12,8 +12,6 @@ class MessageInterfaceHandler
 {
     public function __invoke(MessageInterface $message): void
     {
-        dump($message);
-
-        exit;
+        // TODO
     }
 }
